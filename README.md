@@ -109,7 +109,7 @@ Comprehensive documentation is available in the `Docs/` directory:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/kitchen-pantry-crm.git
+git clone https://github.com/krwhynot/kitchen-pantry-crm.git
 cd kitchen-pantry-crm
 
 # Install dependencies (when implemented)
