@@ -1,0 +1,128 @@
+name: Task/Enhancement
+description: Create a task or enhancement for Kitchen Pantry CRM development
+title: "[Task]: "
+labels: ["task", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to create development tasks, technical improvements, or enhancements that don't fit into bug reports or feature requests.
+
+  - type: textarea
+    id: task-description
+    attributes:
+      label: Task Description
+      description: A clear and concise description of the task or enhancement.
+      placeholder: Describe what needs to be done...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task-type
+    attributes:
+      label: Task Type
+      description: What type of task is this?
+      options:
+        - Code Refactoring
+        - Documentation
+        - Performance Optimization
+        - Security Enhancement
+        - Technical Debt
+        - Testing
+        - Configuration
+        - Infrastructure
+        - Research/Investigation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this task?
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: What area of the application does this task relate to?
+      options:
+        - Frontend
+        - Backend
+        - Database
+        - API
+        - DevOps/Infrastructure
+        - Testing
+        - Documentation
+        - Security
+        - Performance
+        - Build/Deploy
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What specific requirements must be met for this task to be considered complete?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-details
+    attributes:
+      label: Technical Details
+      description: Any technical specifications, constraints, or implementation details.
+      placeholder: Technical requirements, dependencies, or implementation notes...
+
+  - type: textarea
+    id: testing-requirements
+    attributes:
+      label: Testing Requirements
+      description: What testing needs to be done to validate this task?
+      placeholder: Unit tests, integration tests, manual testing steps...
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Are there any dependencies or blockers for this task?
+      placeholder: Other issues, features, or external dependencies...
+
+  - type: input
+    id: estimated-effort
+    attributes:
+      label: Estimated Effort
+      description: Rough estimate of effort required (e.g., 2 hours, 1 day, 1 week)
+      placeholder: e.g., 4 hours
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context or information about the task here.
+      placeholder: Any additional information that might be helpful...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
