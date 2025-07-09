@@ -1,0 +1,120 @@
+{
+  "name": "Kitchen Pantry CRM - MCP Development Configuration",
+  "version": "1.0.0",
+  "description": "MCP configuration for Kitchen Pantry CRM development environment",
+  "environment": "development",
+  "security": {
+    "access_level": "development_only",
+    "restrictions": {
+      "production_access": false,
+      "write_operations": true,
+      "schema_modifications": true,
+      "data_seeding": true,
+      "migration_assistance": true
+    },
+    "allowed_operations": [
+      "schema_analysis",
+      "query_optimization",
+      "data_generation",
+      "migration_creation",
+      "testing_utilities",
+      "development_debugging"
+    ]
+  },
+  "database": {
+    "connection": {
+      "host": "127.0.0.1",
+      "port": 54322,
+      "database": "postgres",
+      "user": "postgres",
+      "password": "postgres",
+      "ssl": false
+    },
+    "schemas": ["public", "auth", "storage", "realtime"],
+    "tables": {
+      "core_entities": [
+        "organizations",
+        "users", 
+        "contacts",
+        "interactions",
+        "opportunities",
+        "products"
+      ],
+      "system_tables": [
+        "auth.users",
+        "auth.sessions",
+        "storage.buckets",
+        "storage.objects"
+      ]
+    }
+  },
+  "mcp_features": {
+    "schema_management": {
+      "enabled": true,
+      "auto_migration": false,
+      "validation": true,
+      "rollback_support": true
+    },
+    "query_assistance": {
+      "enabled": true,
+      "optimization_suggestions": true,
+      "performance_analysis": true,
+      "index_recommendations": true
+    },
+    "data_generation": {
+      "enabled": true,
+      "realistic_data": true,
+      "relationship_aware": true,
+      "volume_control": true
+    },
+    "testing_support": {
+      "enabled": true,
+      "test_data_cleanup": true,
+      "transaction_rollback": true,
+      "isolated_environments": true
+    }
+  },
+  "development_workflows": {
+    "migration_creation": {
+      "template_based": true,
+      "relationship_validation": true,
+      "constraint_checking": true,
+      "rollback_scripts": true
+    },
+    "data_seeding": {
+      "environment_specific": true,
+      "referential_integrity": true,
+      "cleanup_procedures": true,
+      "volume_scaling": true
+    },
+    "schema_exploration": {
+      "interactive_queries": true,
+      "relationship_mapping": true,
+      "dependency_analysis": true,
+      "performance_insights": true
+    }
+  },
+  "monitoring": {
+    "query_logging": true,
+    "performance_tracking": true,
+    "error_reporting": true,
+    "usage_analytics": false
+  },
+  "integrations": {
+    "supabase_cli": {
+      "enabled": true,
+      "auto_sync": true,
+      "migration_hooks": true
+    },
+    "testing_frameworks": {
+      "jest": true,
+      "playwright": true,
+      "vitest": true
+    },
+    "development_tools": {
+      "vscode": true,
+      "database_client": true,
+      "api_documentation": true
+    }
+  }
+}

@@ -1344,6 +1344,148 @@ describe('Database Integration', () => {
 })
 ```
 
+### MCP-Enhanced Development Testing
+
+The Kitchen Pantry CRM development environment includes Supabase MCP (Model Context Protocol) integration to enhance testing capabilities and streamline database testing workflows during development phases.
+
+**MCP Testing Capabilities:**
+- AI-assisted test data generation based on database schema
+- Real-time query analysis and optimization during testing
+- Interactive database exploration for test scenario validation
+- Automated test database setup and teardown
+- Schema-driven test case generation and validation
+
+**Development Testing Workflow:**
+```typescript
+// tests/development/mcp-assisted.test.ts
+import { describe, it, expect } from 'vitest'
+import { mcpClient } from '../helpers/mcp-client'
+
+describe('MCP-Assisted Development Testing', () => {
+  it('generates realistic test data using MCP', async () => {
+    // Use MCP to generate test data based on schema
+    const testOrganizations = await mcpClient.generateTestData('organizations', {
+      count: 10,
+      constraints: {
+        industry_segment: ['Fine Dining', 'Fast Food', 'Catering'],
+        priority_level: ['A', 'B', 'C']
+      }
+    })
+
+    expect(testOrganizations).toHaveLength(10)
+    expect(testOrganizations[0]).toHaveProperty('name')
+    expect(testOrganizations[0]).toHaveProperty('industry_segment')
+    expect(['A', 'B', 'C']).toContain(testOrganizations[0].priority_level)
+  })
+
+  it('validates database schema using MCP analysis', async () => {
+    // Use MCP to analyze schema consistency
+    const schemaAnalysis = await mcpClient.analyzeSchema('organizations')
+    
+    expect(schemaAnalysis.constraints.unique).toContain('name')
+    expect(schemaAnalysis.constraints.required).toContain('name')
+    expect(schemaAnalysis.relationships).toHaveProperty('contacts')
+  })
+
+  it('optimizes test queries using MCP suggestions', async () => {
+    // Use MCP to analyze and optimize test queries
+    const queryPlan = await mcpClient.analyzeQuery(`
+      SELECT o.*, COUNT(c.id) as contact_count
+      FROM organizations o
+      LEFT JOIN contacts c ON o.id = c.organization_id
+      WHERE o.priority_level = 'A'
+      GROUP BY o.id
+    `)
+
+    expect(queryPlan.performance.estimated_cost).toBeLessThan(100)
+    expect(queryPlan.suggestions).toContain('Consider adding index on priority_level')
+  })
+})
+```
+
+**MCP Development Utilities:**
+```typescript
+// tests/helpers/mcp-client.ts
+interface MCPClient {
+  generateTestData(table: string, options: GenerationOptions): Promise<any[]>
+  analyzeSchema(table: string): Promise<SchemaAnalysis>
+  analyzeQuery(sql: string): Promise<QueryAnalysis>
+  seedDatabase(scenario: string): Promise<void>
+  cleanupTestData(): Promise<void>
+}
+
+interface GenerationOptions {
+  count: number
+  constraints?: Record<string, any>
+  relationships?: boolean
+}
+
+interface SchemaAnalysis {
+  constraints: {
+    unique: string[]
+    required: string[]
+    foreign_keys: string[]
+  }
+  relationships: Record<string, any>
+  indexes: string[]
+}
+
+interface QueryAnalysis {
+  performance: {
+    estimated_cost: number
+    execution_time: number
+  }
+  suggestions: string[]
+  optimization_opportunities: string[]
+}
+
+class SupabaseMCPClient implements MCPClient {
+  async generateTestData(table: string, options: GenerationOptions): Promise<any[]> {
+    // Implementation uses MCP to generate realistic test data
+    // This is a development-only feature
+    return []
+  }
+
+  async analyzeSchema(table: string): Promise<SchemaAnalysis> {
+    // Implementation uses MCP to analyze database schema
+    return {
+      constraints: { unique: [], required: [], foreign_keys: [] },
+      relationships: {},
+      indexes: []
+    }
+  }
+
+  async analyzeQuery(sql: string): Promise<QueryAnalysis> {
+    // Implementation uses MCP to analyze query performance
+    return {
+      performance: { estimated_cost: 0, execution_time: 0 },
+      suggestions: [],
+      optimization_opportunities: []
+    }
+  }
+
+  async seedDatabase(scenario: string): Promise<void> {
+    // Implementation uses MCP to seed database with scenario data
+  }
+
+  async cleanupTestData(): Promise<void> {
+    // Implementation uses MCP to clean up test data
+  }
+}
+
+export const mcpClient = new SupabaseMCPClient()
+```
+
+**Development-Only Security:**
+MCP testing utilities are configured exclusively for development environments with restricted access controls. Production and staging environments do not include MCP integration, ensuring security separation between development and production systems.
+
+**Enhanced Development Features:**
+- Real-time database performance monitoring during tests
+- AI-powered test scenario generation based on business requirements
+- Automated test data cleanup and database state management
+- Interactive debugging with database query analysis
+- Schema migration testing with rollback validation
+
 ## End-to-End Testing Implementation
 
 ### User Journey Testing

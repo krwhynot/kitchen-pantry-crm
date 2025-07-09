@@ -1,0 +1,109 @@
+{
+  "security_profile": "development_only",
+  "version": "1.0.0",
+  "last_updated": "2025-01-08",
+  "environment_restrictions": {
+    "allowed_environments": ["development", "testing", "local"],
+    "blocked_environments": ["production", "staging", "live"],
+    "validation_required": true
+  },
+  "access_controls": {
+    "connection_restrictions": {
+      "allowed_hosts": ["127.0.0.1", "localhost"],
+      "blocked_hosts": ["*"],
+      "port_restrictions": {
+        "database": [54322],
+        "api": [54321],
+        "studio": [54323]
+      }
+    },
+    "operation_permissions": {
+      "read_operations": {
+        "schema_inspection": true,
+        "query_analysis": true,
+        "data_exploration": true,
+        "performance_monitoring": true
+      },
+      "write_operations": {
+        "schema_modifications": true,
+        "data_insertion": true,
+        "test_data_generation": true,
+        "migration_creation": true,
+        "seed_data_loading": true
+      },
+      "restricted_operations": {
+        "production_access": false,
+        "user_management": false,
+        "security_changes": false,
+        "backup_operations": false,
+        "system_configuration": false
+      }
+    }
+  },
+  "validation_checks": {
+    "environment_validation": {
+      "check_database_url": true,
+      "verify_local_connection": true,
+      "validate_supabase_config": true,
+      "confirm_development_mode": true
+    },
+    "safety_checks": {
+      "prevent_production_access": true,
+      "require_local_database": true,
+      "validate_connection_limits": true,
+      "check_security_headers": true
+    }
+  },
+  "monitoring": {
+    "audit_logging": {
+      "enabled": true,
+      "log_all_operations": true,
+      "include_query_content": false,
+      "retention_days": 7
+    },
+    "security_alerts": {
+      "suspicious_activity": true,
+      "unauthorized_access": true,
+      "configuration_changes": true,
+      "policy_violations": true
+    }
+  },
+  "compliance": {
+    "data_privacy": {
+      "anonymize_sensitive_data": true,
+      "restrict_personal_info": true,
+      "limit_data_exposure": true
+    },
+    "development_standards": {
+      "require_code_review": true,
+      "validate_migrations": true,
+      "test_before_apply": true,
+      "document_changes": true
+    }
+  },
+  "error_handling": {
+    "policy_violations": {
+      "action": "deny",
+      "log_attempt": true,
+      "notify_admin": false
+    },
+    "connection_errors": {
+      "retry_attempts": 3,
+      "backoff_strategy": "exponential",
+      "timeout_seconds": 30
+    }
+  },
+  "emergency_procedures": {
+    "security_breach": {
+      "immediate_disconnect": true,
+      "revoke_access": true,
+      "notify_team": true,
+      "document_incident": true
+    },
+    "policy_update": {
+      "require_restart": true,
+      "validate_configuration": true,
+      "test_connectivity": true
+    }
+  }
+}

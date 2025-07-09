@@ -45,6 +45,53 @@ The infrastructure implements global distribution to provide optimal performance
 
 **Edge Computing:** Static site generation and edge functions provide server-side rendering and API processing at edge locations. Edge computing reduces latency for dynamic content while maintaining global scalability.
 
+## Development Environment Setup
+
+### Supabase MCP Integration for Development
+
+The Kitchen Pantry CRM development environment includes Supabase MCP (Model Context Protocol) integration to enhance developer productivity and streamline database operations during development phases.
+
+**MCP Installation and Configuration:**
+```bash
+# Install Supabase CLI
+npm install -g @supabase/cli
+
+# Install MCP tools
+npm install -g @supabase/mcp
+
+# Initialize MCP configuration
+supabase mcp init --project-id your-project-id
+```
+
+**Development Database Setup:**
+```bash
+# Start local Supabase instance
+supabase start
+
+# Apply database migrations
+supabase db reset
+
+# Configure MCP connection
+supabase mcp connect --local
+```
+
+**MCP Development Workflow:**
+- Direct database schema management through AI-assisted tools
+- Real-time query analysis and optimization suggestions
+- Automated data seeding and test data generation
+- Interactive database exploration and debugging
+- Schema migration assistance and validation
+
+**Development-Only Security:**
+MCP tools are configured exclusively for development environments with restricted access controls. Production environments do not include MCP integration, ensuring security separation between development and production systems.
+
+**Enhanced Development Features:**
+- AI-powered SQL query generation and optimization
+- Real-time database performance monitoring
+- Automated test data generation based on schema
+- Interactive schema exploration and documentation
+- Development workflow automation and assistance
+
 ## Frontend Deployment Architecture
 
 ### Static Site Generation and CDN Deployment

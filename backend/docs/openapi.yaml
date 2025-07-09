@@ -1,0 +1,2510 @@
+openapi: 3.0.3
+info:
+  title: Kitchen Pantry CRM API
+  description: |
+    A comprehensive RESTful API for managing food service industry relationships, interactions, and sales opportunities. 
+    Built on Node.js/Express with Supabase backend integration, supporting iPad-first CRM operations.
+  version: 1.0.0
+  contact:
+    name: Kitchen Pantry CRM Support
+    email: support@kitchenpantry.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.kitchenpantry.com/v1
+    description: Production server
+  - url: https://staging-api.kitchenpantry.com/v1
+    description: Staging server
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /organizations:
+    get:
+      summary: List organizations
+      description: Retrieves a paginated list of organizations accessible to the authenticated user based on role and territory assignments.
+      tags:
+        - Organizations
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of records per page
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: search
+          in: query
+          description: Full-text search across organization names and descriptions
+          schema:
+            type: string
+        - name: industry_segment
+          in: query
+          description: Filter by industry segment
+          schema:
+            type: string
+            enum: [Fine Dining, Fast Food, Healthcare, Education, Corporate]
+        - name: priority_level
+          in: query
+          description: Filter by priority level
+          schema:
+            type: string
+            enum: [A, B, C, D]
+        - name: assigned_user_id
+          in: query
+          description: Filter by assigned user
+          schema:
+            type: string
+            format: uuid
+        - name: sort
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [name, priority_level, last_interaction_date]
+            default: name
+        - name: order
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create organization
+      description: Creates a new organization record with validation and business rule enforcement.
+      tags:
+        - Organizations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationCreateRequest'
+      responses:
+        '201':
+          description: Organization created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /organizations/{id}:
+    get:
+      summary: Get organization by ID
+      description: Retrieves detailed information for a specific organization including related contacts, recent interactions, and opportunities.
+      tags:
+        - Organizations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Organization ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDetailResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update organization
+      description: Updates an existing organization with complete resource replacement.
+      tags:
+        - Organizations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Organization ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationUpdateRequest'
+      responses:
+        '200':
+          description: Organization updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      summary: Partially update organization
+      description: Performs partial updates to an organization, updating only specified fields.
+      tags:
+        - Organizations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Organization ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationPatchRequest'
+      responses:
+        '200':
+          description: Organization updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete organization
+      description: Soft deletes an organization by setting is_deleted = true. Related contacts and interactions are preserved for audit purposes.
+      tags:
+        - Organizations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Organization ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Organization deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /organizations/{org_id}/contacts:
+    get:
+      summary: List contacts for organization
+      description: Retrieves all contacts within a specific organization with role-based filtering.
+      tags:
+        - Contacts
+      parameters:
+        - name: org_id
+          in: path
+          required: true
+          description: Organization ID
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of records per page
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: search
+          in: query
+          description: Search across contact names, job titles, and email addresses
+          schema:
+            type: string
+        - name: is_primary_contact
+          in: query
+          description: Filter for primary contacts only
+          schema:
+            type: boolean
+        - name: is_decision_maker
+          in: query
+          description: Filter for decision makers only
+          schema:
+            type: boolean
+        - name: authority_level
+          in: query
+          description: Filter by authority level
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /contacts:
+    get:
+      summary: List contacts
+      description: Retrieves contacts accessible to the authenticated user with filtering and search capabilities.
+      tags:
+        - Contacts
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of records per page
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: organization_id
+          in: query
+          description: Filter contacts by organization
+          schema:
+            type: string
+            format: uuid
+        - name: search
+          in: query
+          description: Search across contact names, job titles, and email addresses
+          schema:
+            type: string
+        - name: is_primary_contact
+          in: query
+          description: Filter for primary contacts only
+          schema:
+            type: boolean
+        - name: is_decision_maker
+          in: query
+          description: Filter for decision makers only
+          schema:
+            type: boolean
+        - name: authority_level
+          in: query
+          description: Filter by authority level
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+        - name: last_interaction_days
+          in: query
+          description: Filter contacts with interactions within specified days
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create contact
+      description: Creates a new contact with organization association and validation.
+      tags:
+        - Contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactCreateRequest'
+      responses:
+        '201':
+          description: Contact created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /contacts/{id}:
+    get:
+      summary: Get contact by ID
+      description: Retrieves detailed information for a specific contact.
+      tags:
+        - Contacts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Contact ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactDetailResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update contact
+      description: Updates an existing contact with complete resource replacement.
+      tags:
+        - Contacts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Contact ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactUpdateRequest'
+      responses:
+        '200':
+          description: Contact updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      summary: Partially update contact
+      description: Performs partial updates to a contact, updating only specified fields.
+      tags:
+        - Contacts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Contact ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactPatchRequest'
+      responses:
+        '200':
+          description: Contact updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete contact
+      description: Soft deletes a contact by setting is_deleted = true.
+      tags:
+        - Contacts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Contact ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Contact deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /interactions:
+    get:
+      summary: List interactions
+      description: Retrieves interaction history with filtering, sorting, and pagination capabilities.
+      tags:
+        - Interactions
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of records per page
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: organization_id
+          in: query
+          description: Filter interactions by organization
+          schema:
+            type: string
+            format: uuid
+        - name: contact_id
+          in: query
+          description: Filter interactions by contact
+          schema:
+            type: string
+            format: uuid
+        - name: user_id
+          in: query
+          description: Filter interactions by user
+          schema:
+            type: string
+            format: uuid
+        - name: interaction_type
+          in: query
+          description: Filter by interaction type
+          schema:
+            type: string
+            enum: [CALL, EMAIL, MEETING, VISIT, TEXT, SOCIAL]
+        - name: date_from
+          in: query
+          description: Filter interactions from specified date
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          description: Filter interactions to specified date
+          schema:
+            type: string
+            format: date
+        - name: outcome
+          in: query
+          description: Filter by interaction outcome
+          schema:
+            type: string
+            enum: [Positive, Neutral, Negative, Very Positive, Very Negative]
+        - name: follow_up_required
+          in: query
+          description: Filter interactions requiring follow-up
+          schema:
+            type: boolean
+        - name: priority_level
+          in: query
+          description: Filter by priority level
+          schema:
+            type: string
+            enum: [A, B, C, D]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create interaction
+      description: Creates a new interaction record with automatic relationship updates and follow-up scheduling.
+      tags:
+        - Interactions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InteractionCreateRequest'
+      responses:
+        '201':
+          description: Interaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /interactions/{id}:
+    get:
+      summary: Get interaction by ID
+      description: Retrieves detailed information for a specific interaction.
+      tags:
+        - Interactions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Interaction ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionDetailResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update interaction
+      description: Updates an existing interaction with complete resource replacement.
+      tags:
+        - Interactions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Interaction ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InteractionUpdateRequest'
+      responses:
+        '200':
+          description: Interaction updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      summary: Partially update interaction
+      description: Performs partial updates to an interaction, updating only specified fields.
+      tags:
+        - Interactions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Interaction ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InteractionPatchRequest'
+      responses:
+        '200':
+          description: Interaction updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete interaction
+      description: Soft deletes an interaction by setting is_deleted = true.
+      tags:
+        - Interactions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Interaction ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Interaction deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities:
+    get:
+      summary: List opportunities
+      description: Retrieves opportunities with pipeline analysis and forecasting capabilities.
+      tags:
+        - Opportunities
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of records per page
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 100
+        - name: organization_id
+          in: query
+          description: Filter opportunities by organization
+          schema:
+            type: string
+            format: uuid
+        - name: user_id
+          in: query
+          description: Filter opportunities by assigned user
+          schema:
+            type: string
+            format: uuid
+        - name: stage
+          in: query
+          description: Filter by sales stage
+          schema:
+            type: string
+            enum: [prospecting, qualification, needs_analysis, proposal, negotiation, closed_won, closed_lost]
+        - name: probability_min
+          in: query
+          description: Minimum probability threshold
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+        - name: estimated_value_min
+          in: query
+          description: Minimum estimated value
+          schema:
+            type: number
+            format: decimal
+            minimum: 0
+        - name: close_date_from
+          in: query
+          description: Filter by estimated close date range (from)
+          schema:
+            type: string
+            format: date
+        - name: close_date_to
+          in: query
+          description: Filter by estimated close date range (to)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunityListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create opportunity
+      description: Creates a new sales opportunity with BANT qualification tracking.
+      tags:
+        - Opportunities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpportunityCreateRequest'
+      responses:
+        '201':
+          description: Opportunity created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunityResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /opportunities/{id}:
+    get:
+      summary: Get opportunity by ID
+      description: Retrieves detailed information for a specific opportunity.
+      tags:
+        - Opportunities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Opportunity ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunityDetailResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update opportunity
+      description: Updates an existing opportunity with complete resource replacement.
+      tags:
+        - Opportunities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Opportunity ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpportunityUpdateRequest'
+      responses:
+        '200':
+          description: Opportunity updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunityResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      summary: Partially update opportunity
+      description: Performs partial updates to an opportunity, updating only specified fields.
+      tags:
+        - Opportunities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Opportunity ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OpportunityPatchRequest'
+      responses:
+        '200':
+          description: Opportunity updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpportunityResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete opportunity
+      description: Soft deletes an opportunity by setting is_deleted = true.
+      tags:
+        - Opportunities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Opportunity ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Opportunity deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /search:
+    get:
+      summary: Unified search
+      description: Provides unified search across organizations, contacts, and opportunities with relevance scoring.
+      tags:
+        - Search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query
+          schema:
+            type: string
+        - name: types
+          in: query
+          description: Resource types to search
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [organizations, contacts, opportunities]
+        - name: limit
+          in: query
+          description: Maximum results per type
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 50
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /analytics/dashboard:
+    get:
+      summary: Dashboard analytics
+      description: Provides dashboard KPI metrics and performance indicators.
+      tags:
+        - Analytics
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardAnalyticsResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /files/upload:
+    post:
+      summary: Upload file
+      description: Handles file uploads with virus scanning and metadata extraction.
+      tags:
+        - Files
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to upload
+                entity_type:
+                  type: string
+                  enum: [organization, contact, interaction, opportunity]
+                  description: Type of entity the file is associated with
+                entity_id:
+                  type: string
+                  format: uuid
+                  description: ID of the entity the file is associated with
+              required:
+                - file
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token issued by Supabase Auth
+
+  schemas:
+    # Base schemas
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: "123 Main St"
+        city:
+          type: string
+          example: "Anytown"
+        state:
+          type: string
+          example: "CA"
+        postal_code:
+          type: string
+          example: "90210"
+        country:
+          type: string
+          example: "US"
+      required:
+        - street
+        - city
+        - state
+        - postal_code
+        - country
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+        email:
+          type: string
+          format: email
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 50
+        total:
+          type: integer
+          example: 150
+        pages:
+          type: integer
+          example: 3
+        has_next:
+          type: boolean
+          example: true
+        has_prev:
+          type: boolean
+          example: false
+        next_cursor:
+          type: string
+          nullable: true
+        prev_cursor:
+          type: string
+          nullable: true
+
+    ResponseMetadata:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        request_id:
+          type: string
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Organization schemas
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        industry_segment:
+          type: string
+          enum: [Fine Dining, Fast Food, Healthcare, Education, Corporate]
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+        business_type:
+          type: string
+        annual_revenue:
+          type: number
+          format: decimal
+        employee_count:
+          type: integer
+        website_url:
+          type: string
+          format: uri
+        primary_phone:
+          type: string
+        primary_email:
+          type: string
+          format: email
+        account_status:
+          type: string
+          enum: [active, inactive, suspended]
+        assigned_user:
+          $ref: '#/components/schemas/User'
+        last_interaction_date:
+          type: string
+          format: date-time
+        next_follow_up_date:
+          type: string
+          format: date-time
+        relationship_strength:
+          type: integer
+          minimum: 1
+          maximum: 10
+        contact_count:
+          type: integer
+        opportunity_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    OrganizationDetail:
+      allOf:
+        - $ref: '#/components/schemas/Organization'
+        - type: object
+          properties:
+            billing_address:
+              $ref: '#/components/schemas/Address'
+            shipping_address:
+              $ref: '#/components/schemas/Address'
+            payment_terms:
+              type: string
+            credit_limit:
+              type: number
+              format: decimal
+            notes:
+              type: string
+            contacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/Contact'
+            recent_interactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/InteractionSummary'
+            opportunities:
+              type: array
+              items:
+                $ref: '#/components/schemas/OpportunitySummary'
+
+    OrganizationCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        industry_segment:
+          type: string
+          enum: [Fine Dining, Fast Food, Healthcare, Education, Corporate]
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+        business_type:
+          type: string
+        annual_revenue:
+          type: number
+          format: decimal
+          minimum: 0
+        employee_count:
+          type: integer
+          minimum: 0
+        website_url:
+          type: string
+          format: uri
+        primary_phone:
+          type: string
+        primary_email:
+          type: string
+          format: email
+        billing_address:
+          $ref: '#/components/schemas/Address'
+        shipping_address:
+          $ref: '#/components/schemas/Address'
+        payment_terms:
+          type: string
+        credit_limit:
+          type: number
+          format: decimal
+          minimum: 0
+        notes:
+          type: string
+      required:
+        - name
+        - industry_segment
+        - priority_level
+
+    OrganizationUpdateRequest:
+      $ref: '#/components/schemas/OrganizationCreateRequest'
+
+    OrganizationPatchRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        industry_segment:
+          type: string
+          enum: [Fine Dining, Fast Food, Healthcare, Education, Corporate]
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+        business_type:
+          type: string
+        annual_revenue:
+          type: number
+          format: decimal
+          minimum: 0
+        employee_count:
+          type: integer
+          minimum: 0
+        website_url:
+          type: string
+          format: uri
+        primary_phone:
+          type: string
+        primary_email:
+          type: string
+          format: email
+        billing_address:
+          $ref: '#/components/schemas/Address'
+        shipping_address:
+          $ref: '#/components/schemas/Address'
+        payment_terms:
+          type: string
+        credit_limit:
+          type: number
+          format: decimal
+          minimum: 0
+        notes:
+          type: string
+
+    OrganizationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Organization'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    OrganizationDetailResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/OrganizationDetail'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    OrganizationListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    # Contact schemas
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        organization_id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        full_name:
+          type: string
+        job_title:
+          type: string
+        department:
+          type: string
+        is_primary_contact:
+          type: boolean
+        is_decision_maker:
+          type: boolean
+        authority_level:
+          type: integer
+          minimum: 1
+          maximum: 5
+        email_primary:
+          type: string
+          format: email
+        phone_primary:
+          type: string
+        mobile_phone:
+          type: string
+        preferred_contact_method:
+          type: string
+          enum: [email, phone, text, linkedin]
+        preferred_contact_time:
+          type: string
+        linkedin_url:
+          type: string
+          format: uri
+        communication_preferences:
+          type: object
+          properties:
+            email_frequency:
+              type: string
+              enum: [daily, weekly, monthly, quarterly]
+            content_types:
+              type: array
+              items:
+                type: string
+            opt_out_marketing:
+              type: boolean
+        last_interaction_date:
+          type: string
+          format: date-time
+        next_follow_up_date:
+          type: string
+          format: date-time
+        relationship_score:
+          type: integer
+          minimum: 1
+          maximum: 10
+        influence_score:
+          type: integer
+          minimum: 1
+          maximum: 10
+        engagement_level:
+          type: string
+          enum: [low, medium, high]
+        interaction_count:
+          type: integer
+        organization:
+          type: object
+          properties:
+            name:
+              type: string
+            industry_segment:
+              type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ContactCreateRequest:
+      type: object
+      properties:
+        organization_id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        job_title:
+          type: string
+        department:
+          type: string
+        is_primary_contact:
+          type: boolean
+          default: false
+        is_decision_maker:
+          type: boolean
+          default: false
+        authority_level:
+          type: integer
+          minimum: 1
+          maximum: 5
+        email_primary:
+          type: string
+          format: email
+        phone_primary:
+          type: string
+        mobile_phone:
+          type: string
+        preferred_contact_method:
+          type: string
+          enum: [email, phone, text, linkedin]
+        preferred_contact_time:
+          type: string
+        linkedin_url:
+          type: string
+          format: uri
+        communication_preferences:
+          type: object
+          properties:
+            email_frequency:
+              type: string
+              enum: [daily, weekly, monthly, quarterly]
+            content_types:
+              type: array
+              items:
+                type: string
+            opt_out_marketing:
+              type: boolean
+              default: false
+            best_contact_time:
+              type: string
+      required:
+        - organization_id
+        - first_name
+        - last_name
+        - email_primary
+
+    ContactUpdateRequest:
+      $ref: '#/components/schemas/ContactCreateRequest'
+
+    ContactPatchRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        job_title:
+          type: string
+        department:
+          type: string
+        is_primary_contact:
+          type: boolean
+        is_decision_maker:
+          type: boolean
+        authority_level:
+          type: integer
+          minimum: 1
+          maximum: 5
+        email_primary:
+          type: string
+          format: email
+        phone_primary:
+          type: string
+        mobile_phone:
+          type: string
+        preferred_contact_method:
+          type: string
+          enum: [email, phone, text, linkedin]
+        preferred_contact_time:
+          type: string
+        linkedin_url:
+          type: string
+          format: uri
+        communication_preferences:
+          type: object
+          properties:
+            email_frequency:
+              type: string
+              enum: [daily, weekly, monthly, quarterly]
+            content_types:
+              type: array
+              items:
+                type: string
+            opt_out_marketing:
+              type: boolean
+            best_contact_time:
+              type: string
+
+    ContactResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Contact'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    ContactDetailResponse:
+      $ref: '#/components/schemas/ContactResponse'
+
+    ContactListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    # Interaction schemas
+    Interaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        organization:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+        contact:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            full_name:
+              type: string
+            job_title:
+              type: string
+        user:
+          $ref: '#/components/schemas/User'
+        interaction_type:
+          type: string
+          enum: [CALL, EMAIL, MEETING, VISIT, TEXT, SOCIAL]
+        interaction_date:
+          type: string
+          format: date-time
+        duration_minutes:
+          type: integer
+          minimum: 0
+        subject:
+          type: string
+        description:
+          type: string
+        outcome:
+          type: string
+          enum: [Positive, Neutral, Negative, Very Positive, Very Negative]
+        outcome_details:
+          type: string
+        follow_up_required:
+          type: boolean
+        follow_up_date:
+          type: string
+          format: date-time
+        follow_up_notes:
+          type: string
+        location:
+          type: string
+        meeting_attendees:
+          type: array
+          items:
+            type: string
+        sentiment_score:
+          type: integer
+          minimum: 1
+          maximum: 5
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+        tags:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    InteractionSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        interaction_type:
+          type: string
+          enum: [CALL, EMAIL, MEETING, VISIT, TEXT, SOCIAL]
+        interaction_date:
+          type: string
+          format: date-time
+        subject:
+          type: string
+        outcome:
+          type: string
+          enum: [Positive, Neutral, Negative, Very Positive, Very Negative]
+        user:
+          type: object
+          properties:
+            full_name:
+              type: string
+
+    InteractionCreateRequest:
+      type: object
+      properties:
+        organization_id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        interaction_type:
+          type: string
+          enum: [CALL, EMAIL, MEETING, VISIT, TEXT, SOCIAL]
+        interaction_date:
+          type: string
+          format: date-time
+        duration_minutes:
+          type: integer
+          minimum: 0
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+        outcome:
+          type: string
+          enum: [Positive, Neutral, Negative, Very Positive, Very Negative]
+        outcome_details:
+          type: string
+        follow_up_required:
+          type: boolean
+          default: false
+        follow_up_date:
+          type: string
+          format: date-time
+        follow_up_notes:
+          type: string
+        location:
+          type: string
+        meeting_attendees:
+          type: array
+          items:
+            type: string
+        sentiment_score:
+          type: integer
+          minimum: 1
+          maximum: 5
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+        tags:
+          type: array
+          items:
+            type: string
+      required:
+        - organization_id
+        - contact_id
+        - interaction_type
+        - interaction_date
+        - subject
+        - outcome
+
+    InteractionUpdateRequest:
+      $ref: '#/components/schemas/InteractionCreateRequest'
+
+    InteractionPatchRequest:
+      type: object
+      properties:
+        interaction_type:
+          type: string
+          enum: [CALL, EMAIL, MEETING, VISIT, TEXT, SOCIAL]
+        interaction_date:
+          type: string
+          format: date-time
+        duration_minutes:
+          type: integer
+          minimum: 0
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+        outcome:
+          type: string
+          enum: [Positive, Neutral, Negative, Very Positive, Very Negative]
+        outcome_details:
+          type: string
+        follow_up_required:
+          type: boolean
+        follow_up_date:
+          type: string
+          format: date-time
+        follow_up_notes:
+          type: string
+        location:
+          type: string
+        meeting_attendees:
+          type: array
+          items:
+            type: string
+        sentiment_score:
+          type: integer
+          minimum: 1
+          maximum: 5
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+        tags:
+          type: array
+          items:
+            type: string
+
+    InteractionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Interaction'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    InteractionDetailResponse:
+      $ref: '#/components/schemas/InteractionResponse'
+
+    InteractionListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Interaction'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    # Opportunity schemas
+    Opportunity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        organization:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            priority_level:
+              type: string
+              enum: [A, B, C, D]
+        primary_contact:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            full_name:
+              type: string
+            job_title:
+              type: string
+        user:
+          $ref: '#/components/schemas/User'
+        opportunity_name:
+          type: string
+        description:
+          type: string
+        opportunity_type:
+          type: string
+          enum: [New Business, Existing Business, Renewal, Upsell, Cross-sell]
+        stage:
+          type: string
+          enum: [prospecting, qualification, needs_analysis, proposal, negotiation, closed_won, closed_lost]
+        probability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        estimated_value:
+          type: number
+          format: decimal
+        estimated_close_date:
+          type: string
+          format: date
+        sales_cycle_days:
+          type: integer
+        lead_source:
+          type: string
+        budget_confirmed:
+          type: boolean
+        authority_confirmed:
+          type: boolean
+        need_confirmed:
+          type: boolean
+        timeline_confirmed:
+          type: boolean
+        proposal_submitted:
+          type: boolean
+        proposal_date:
+          type: string
+          format: date
+        decision_criteria:
+          type: string
+        decision_timeline:
+          type: string
+        competitor_info:
+          type: string
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+        recent_interactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractionSummary'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    OpportunitySummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        opportunity_name:
+          type: string
+        stage:
+          type: string
+          enum: [prospecting, qualification, needs_analysis, proposal, negotiation, closed_won, closed_lost]
+        estimated_value:
+          type: number
+          format: decimal
+        estimated_close_date:
+          type: string
+          format: date
+
+    OpportunityCreateRequest:
+      type: object
+      properties:
+        organization_id:
+          type: string
+          format: uuid
+        primary_contact_id:
+          type: string
+          format: uuid
+        opportunity_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+        opportunity_type:
+          type: string
+          enum: [New Business, Existing Business, Renewal, Upsell, Cross-sell]
+        stage:
+          type: string
+          enum: [prospecting, qualification, needs_analysis, proposal, negotiation, closed_won, closed_lost]
+        probability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        estimated_value:
+          type: number
+          format: decimal
+          minimum: 0
+        estimated_close_date:
+          type: string
+          format: date
+        lead_source:
+          type: string
+        budget_confirmed:
+          type: boolean
+          default: false
+        authority_confirmed:
+          type: boolean
+          default: false
+        need_confirmed:
+          type: boolean
+          default: false
+        timeline_confirmed:
+          type: boolean
+          default: false
+        decision_criteria:
+          type: string
+        decision_timeline:
+          type: string
+        competitor_info:
+          type: string
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+      required:
+        - organization_id
+        - primary_contact_id
+        - opportunity_name
+        - stage
+        - estimated_value
+        - estimated_close_date
+
+    OpportunityUpdateRequest:
+      $ref: '#/components/schemas/OpportunityCreateRequest'
+
+    OpportunityPatchRequest:
+      type: object
+      properties:
+        opportunity_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+        opportunity_type:
+          type: string
+          enum: [New Business, Existing Business, Renewal, Upsell, Cross-sell]
+        stage:
+          type: string
+          enum: [prospecting, qualification, needs_analysis, proposal, negotiation, closed_won, closed_lost]
+        probability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        estimated_value:
+          type: number
+          format: decimal
+          minimum: 0
+        estimated_close_date:
+          type: string
+          format: date
+        lead_source:
+          type: string
+        budget_confirmed:
+          type: boolean
+        authority_confirmed:
+          type: boolean
+        need_confirmed:
+          type: boolean
+        timeline_confirmed:
+          type: boolean
+        decision_criteria:
+          type: string
+        decision_timeline:
+          type: string
+        competitor_info:
+          type: string
+        priority_level:
+          type: string
+          enum: [A, B, C, D]
+
+    OpportunityResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Opportunity'
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    OpportunityDetailResponse:
+      $ref: '#/components/schemas/OpportunityResponse'
+
+    OpportunityListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Opportunity'
+        meta:
+          allOf:
+            - $ref: '#/components/schemas/ResponseMetadata'
+            - type: object
+              properties:
+                pipeline_summary:
+                  type: object
+                  properties:
+                    total_opportunities:
+                      type: integer
+                    total_value:
+                      type: number
+                      format: decimal
+                    weighted_value:
+                      type: number
+                      format: decimal
+                    average_deal_size:
+                      type: number
+                      format: decimal
+                    average_sales_cycle:
+                      type: integer
+
+    # Search schemas
+    SearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [organization, contact, opportunity]
+        relevance_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+
+    SearchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            organizations:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/SearchResult'
+                  - type: object
+                    properties:
+                      industry_segment:
+                        type: string
+            contacts:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/SearchResult'
+                  - type: object
+                    properties:
+                      full_name:
+                        type: string
+                      job_title:
+                        type: string
+                      organization_name:
+                        type: string
+            opportunities:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/SearchResult'
+                  - type: object
+                    properties:
+                      opportunity_name:
+                        type: string
+                      organization_name:
+                        type: string
+                      stage:
+                        type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    # Analytics schemas
+    DashboardAnalyticsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            kpis:
+              type: object
+              properties:
+                total_organizations:
+                  type: integer
+                total_contacts:
+                  type: integer
+                total_opportunities:
+                  type: integer
+                pipeline_value:
+                  type: number
+                  format: decimal
+                weighted_pipeline:
+                  type: number
+                  format: decimal
+                activities_this_week:
+                  type: integer
+                follow_ups_due:
+                  type: integer
+            trends:
+              type: object
+              properties:
+                organizations_growth:
+                  type: number
+                  format: float
+                pipeline_growth:
+                  type: number
+                  format: float
+                activity_trend:
+                  type: number
+                  format: float
+            pipeline_by_stage:
+              type: array
+              items:
+                type: object
+                properties:
+                  stage:
+                    type: string
+                  count:
+                    type: integer
+                  value:
+                    type: number
+                    format: decimal
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    # File upload schemas
+    FileUploadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            file_id:
+              type: string
+              format: uuid
+            filename:
+              type: string
+            size:
+              type: integer
+            mime_type:
+              type: string
+            url:
+              type: string
+              format: uri
+            metadata:
+              type: object
+              properties:
+                pages:
+                  type: integer
+                created_date:
+                  type: string
+                  format: date-time
+        meta:
+          $ref: '#/components/schemas/ResponseMetadata'
+
+    # Error schemas
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              message:
+                type: string
+              field:
+                type: string
+              details:
+                type: string
+        meta:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+            request_id:
+              type: string
+            retry_after:
+              type: integer
+
+  responses:
+    UnauthorizedError:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            errors:
+              - code: UNAUTHORIZED
+                message: Authentication required
+                details: Valid JWT token required in Authorization header
+
+    ForbiddenError:
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            errors:
+              - code: FORBIDDEN
+                message: Access denied
+                details: Insufficient permissions for this resource
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            errors:
+              - code: NOT_FOUND
+                message: Resource not found
+                details: The requested resource does not exist
+
+    BadRequestError:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            errors:
+              - code: BAD_REQUEST
+                message: Invalid request format
+                details: Request body must be valid JSON
+
+    ConflictError:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            errors:
+              - code: CONFLICT
+                message: Resource conflict
+                details: Organization name already exists
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            errors:
+              - code: VALIDATION_ERROR
+                message: Invalid input data
+                field: email_primary
+                details: Email format is invalid
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            errors:
+              - code: INTERNAL_ERROR
+                message: Internal server error
+                details: An unexpected error occurred
+
+tags:
+  - name: Organizations
+    description: Organization management endpoints
+  - name: Contacts
+    description: Contact management endpoints
+  - name: Interactions
+    description: Interaction tracking endpoints
+  - name: Opportunities
+    description: Opportunity management endpoints
+  - name: Search
+    description: Search and discovery endpoints
+  - name: Analytics
+    description: Analytics and reporting endpoints
+  - name: Files
+    description: File upload and management endpoints
