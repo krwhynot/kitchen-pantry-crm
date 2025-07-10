@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <RouterView />
+    <LayoutManager />
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import LayoutManager from '@/components/LayoutManager.vue'
 </script>
 
 <style>

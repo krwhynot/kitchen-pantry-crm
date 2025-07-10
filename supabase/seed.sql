@@ -12,7 +12,7 @@ VALUES
     ('00000000-0000-0000-0000-000000000003', 'Metro Food Distribution', 'distributor', 'distribution', '555-0103', 'sales@metrofood.com', '789 Industrial Blvd', 'Chicago', 'IL', '60601', 'USA', 'https://metrofood.com', 'Regional food distribution and logistics', NOW(), NOW());
 
 -- Insert sample users
-INSERT INTO users (id, email, password_hash, first_name, last_name, role, territory, phone, avatar_url, is_active, last_login, created_at, updated_at)
+INSERT INTO users (id, email, password_hash, first_name, last_name, role, phone, avatar_url, is_active, last_login, created_at, updated_at)
 VALUES 
     ('10000000-0000-0000-0000-000000000001', 'john.doe@kitchenpantry.com', '$2a$10$example.hash.here', 'John', 'Doe', 'admin', 'northeast', '555-1001', NULL, true, NOW(), NOW(), NOW()),
     ('10000000-0000-0000-0000-000000000002', 'jane.smith@kitchenpantry.com', '$2a$10$example.hash.here', 'Jane', 'Smith', 'sales_rep', 'northeast', '555-1002', NULL, true, NOW(), NOW(), NOW()),
@@ -44,7 +44,7 @@ INSERT INTO interactions (id, organization_id, contact_id, user_id, type, subjec
 VALUES 
     ('50000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002', 'phone_call', 'Initial Menu Planning Discussion', 'Discussed seasonal menu changes and ingredient requirements. Chef Wilson expressed interest in premium beef options.', 'positive', 'Send product catalog and pricing', NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days'),
     ('50000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', 'meeting', 'Contract Review Meeting', 'Reviewed proposed contract terms and discussed volume pricing. Need to address delivery schedule concerns.', 'neutral', 'Prepare revised delivery schedule proposal', NOW() + INTERVAL '1 day', NULL, NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day'),
-    ('50000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000003', 'email', 'Partnership Proposal Follow-up', 'Sent detailed partnership proposal including logistics capabilities and territory coverage maps.', 'positive', 'Schedule presentation with executive team', NOW() + INTERVAL '3 days', NULL, NOW(), NOW());
+    ('50000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000003', 'email', 'Partnership Proposal Follow-up', 'Sent detailed partnership proposal including logistics capabilities and  map.', 'positive', 'Schedule presentation with executive team', NOW() + INTERVAL '3 days', NULL, NOW(), NOW());
 
 -- Set up RLS policies for development (simplified for testing)
 -- Note: In production, these should be more restrictive

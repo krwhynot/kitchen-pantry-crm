@@ -259,12 +259,6 @@ describe('Search API', () => {
       expect(response.body.errors[0].code).toBe('UNAUTHORIZED');
     });
 
-    it('should respect user permissions and territory restrictions', async () => {
-      // This test assumes the search respects user's access permissions
-      const response = await authenticatedRequest('get', '/api/v1/search')
-        .query({ q: 'Test' })
-        .expect(200);
-
       expect(response.body.success).toBe(true);
       
       // All returned results should be accessible to the current user

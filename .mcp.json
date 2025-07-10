@@ -13,7 +13,9 @@
         },
         "playwright": {
             "command": "npx",
-            "args": ["@playwright/mcp@latest"]
+            "args": [
+                "@playwright/mcp@latest"
+            ]
         },
         "supabase": {
             "command": "npx",
@@ -24,26 +26,6 @@
             ],
             "env": {
                 "SUPABASE_ACCESS_TOKEN": "sbp_0faf75548a427af4dc57c9b90ddbe3481a6894d3"
-            }
-        },
-        "perplexity-ask": {
-            "command": "npx",
-            "args": ["-y", "server-perplexity-ask"],
-            "env": {
-                "PERPLEXITY_API_KEY": "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"
-            }
-        },
-        "filesystem": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@modelcontextprotocol/server-filesystem@latest",
-                "/home/krwhynot/Projects/ForkFlow-crm"
-            ],
-            "env": {
-                "MCP_TRANSPORT": "stdio",
-                "MCP_LOG_LEVEL": "info",
-                "NODE_ENV": "production"
             }
         },
         "sequential-thinking": {
@@ -71,7 +53,10 @@
         },
         "Context7": {
             "command": "npx",
-            "args": ["-y", "@upstash/context7-mcp"]
+            "args": [
+                "-y",
+                "@upstash/context7-mcp"
+            ]
         }
     }
 }

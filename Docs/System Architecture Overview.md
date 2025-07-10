@@ -74,8 +74,8 @@ Static Site Generation: The Vue.js application is built into static assets that 
 Environment Configuration: Different environments (development, staging, production) are managed through environment variables that configure API endpoints, authentication settings, and feature flags.
 Continuous Deployment: GitHub integration enables automatic deployment when code is pushed to specific branches. This automation ensures rapid iteration and consistent deployment processes.
 Backend Deployment Strategy
-The Node.js middleware is deployed to container-based platforms like Railway or Render, providing scalable hosting with automatic scaling based on demand.
-Container-based Deployment: Docker containers ensure consistent runtime environments across development, staging, and production deployments. Container orchestration handles scaling and health monitoring.
+The Node.js middleware is deployed through Supabase MCP managed hosting, providing scalable infrastructure with automatic scaling based on demand.
+Supabase MCP Deployment: Supabase MCP tools manage consistent runtime environments across development, staging, and production deployments. MCP resource management handles scaling and health monitoring.
 Health Monitoring: The API includes health check endpoints that monitor database connectivity, external service availability, and system performance. These endpoints enable automated monitoring and alerting.
 Graceful Shutdown: The application handles shutdown signals gracefully, completing in-flight requests and closing database connections properly. This behavior ensures data integrity during deployments and scaling events.
 Performance Architecture

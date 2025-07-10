@@ -27,7 +27,7 @@ paths:
   /organizations:
     get:
       summary: List organizations
-      description: Retrieves a paginated list of organizations accessible to the authenticated user based on role and territory assignments.
+      description: Retrieves a paginated list of organizations accessible to the authenticated user based on role
       tags:
         - Organizations
       parameters:

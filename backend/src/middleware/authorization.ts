@@ -5,7 +5,6 @@ import { AuthenticatedRequest } from './auth'
 
 export interface AuthorizationContext {
   organizationId?: string
-  territory?: string
   resourceId?: string
   resourceOwnerId?: string
   requiredLevel?: number
@@ -14,7 +13,7 @@ export interface AuthorizationContext {
 export interface ResourceAccessRule {
   resource: string
   action: string
-  level: 'organization' | 'territory' | 'user' | 'global'
+  level: 'organization' | 'user' | 'global'
   conditions?: (req: AuthenticatedRequest) => boolean | Promise<boolean>
 }
 
@@ -29,7 +28,6 @@ export class AuthorizationMiddleware {
         // Build authorization context
         const authContext: AuthorizationContext = {
           organizationId: context?.organizationId || req.user.organizationId,
-          territory: context?.territory || req.params.territory,
           resourceId: context?.resourceId || req.params.id,
           resourceOwnerId: context?.resourceOwnerId,
           ...context
@@ -250,58 +248,6 @@ export class AuthorizationMiddleware {
     }
   }
 
-  static requireTerritoryAccess(territoryField: string = 'territory') {
-    return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-      try {
-        if (!req.user) {
-          throw new AppError('Authentication required', 401)
-        }
-
-        // Get target territory
-        let targetTerritory: string | undefined
-
-        // Check request body
-        if (req.body && req.body[territoryField]) {
-          targetTerritory = req.body[territoryField]
-        }
-
-        // Check URL parameters
-        if (!targetTerritory && req.params[territoryField]) {
-          targetTerritory = req.params[territoryField]
-        }
-
-        // Check query parameters
-        if (!targetTerritory && req.query[territoryField]) {
-          targetTerritory = req.query[territoryField] as string
-        }
-
-        // If territory is specified, check access
-        if (targetTerritory) {
-          const hasAccess = await RBACService.checkResourceAccess(
-            req.user.id,
-            'territory',
-            {
-              organizationId: req.user.organizationId,
-              territory: targetTerritory
-            }
-          )
-
-          if (!hasAccess) {
-            throw new AppError('Access denied: territory access required', 403)
-          }
-        }
-
-        req.targetTerritory = targetTerritory
-        next()
-      } catch (error) {
-        if (error instanceof AppError) {
-          next(error)
-        } else {
-          next(new AppError('Territory authorization failed', 500))
-        }
-      }
-    }
-  }
 
   static conditionalAccess(condition: (req: AuthenticatedRequest) => boolean | Promise<boolean>) {
     return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -335,7 +281,6 @@ export class AuthorizationMiddleware {
         rule.action,
         {
           organizationId: req.user!.organizationId,
-          territory: req.params.territory,
           resourceId: req.params.id
         }
       )
@@ -388,7 +333,6 @@ declare module './auth' {
     authContext?: AuthorizationContext
     userRoles?: any[]
     targetOrganizationId?: string
-    targetTerritory?: string
     supabase?: any
   }
 }
@@ -399,7 +343,6 @@ export const requireRole = AuthorizationMiddleware.requireRole
 export const requireLevel = AuthorizationMiddleware.requireLevel
 export const requireOwnership = AuthorizationMiddleware.requireOwnership
 export const requireOrganizationAccess = AuthorizationMiddleware.requireOrganizationAccess
-export const requireTerritoryAccess = AuthorizationMiddleware.requireTerritoryAccess
 export const conditionalAccess = AuthorizationMiddleware.conditionalAccess
 export const createResourceRule = AuthorizationMiddleware.createResourceRule
 export const auditAccess = AuthorizationMiddleware.auditAccess

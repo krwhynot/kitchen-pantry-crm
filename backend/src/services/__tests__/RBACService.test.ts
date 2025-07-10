@@ -73,7 +73,6 @@ describe('RBACService', () => {
     email: 'test@example.com',
     role: 'sales_rep',
     organizationId: 'org-1',
-    territory: 'west-coast'
   }
 
   const mockRole = {
@@ -541,7 +540,6 @@ describe('RBACService', () => {
     })
 
     it('should assign role with conditions', async () => {
-      const conditions = { territory: 'west-coast' }
       mockSupabase.single.mockResolvedValue({
         data: { ...mockUserRole, conditions },
         error: null
@@ -645,25 +643,6 @@ describe('RBACService', () => {
       expect(result).toBe(false)
     })
 
-    it('should handle territory-based access control', async () => {
-      const territoryPermission = {
-        ...mockPermission,
-        conditions: { requireOwnTerritory: true }
-      }
-
-      jest.spyOn(RBACService, 'getUserPermissions').mockResolvedValue([territoryPermission])
-
-      const result = await RBACService.checkResourceAccess(
-        'user-1',
-        'contacts',
-        'read',
-        { territory: 'west-coast' },
-        mockUser
-      )
-
-      expect(result).toBe(true)
-    })
-
     it('should handle resource access errors', async () => {
       jest.spyOn(RBACService, 'getUserPermissions').mockRejectedValue(new Error('Resource access check failed'))
 
@@ -683,7 +662,6 @@ describe('RBACService', () => {
         permissions: [mockPermission],
         roles: [mockRole],
         organizationId: 'org-1',
-        territory: 'west-coast',
         effectiveFrom: expect.any(String),
         expiresAt: null
       }
@@ -700,7 +678,6 @@ describe('RBACService', () => {
         permissions: [mockPermission],
         roles: [mockRole],
         organizationId: 'org-1',
-        territory: 'west-coast'
       }))
     })
 
@@ -714,7 +691,6 @@ describe('RBACService', () => {
         permissions: [],
         roles: [],
         organizationId: 'org-1',
-        territory: 'west-coast'
       }))
     })
 

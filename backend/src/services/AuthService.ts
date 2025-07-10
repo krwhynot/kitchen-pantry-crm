@@ -14,7 +14,6 @@ export interface UserRegistrationData {
   role: 'admin' | 'manager' | 'sales_rep' | 'viewer'
   organizationId: string
   phone?: string
-  territory?: string
 }
 
 export interface LoginAttempt {
@@ -236,7 +235,6 @@ export class AuthService {
         role: sanitizedData.role,
         organizationId: sanitizedData.organizationId,
         phone: sanitizedData.phone,
-        territory: sanitizedData.territory,
         isActive: true,
         emailVerified: false,
         lastPasswordChange: new Date().toISOString()

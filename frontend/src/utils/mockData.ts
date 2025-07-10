@@ -26,7 +26,6 @@ export class MockDataGenerator {
       last_name: `Last${id}`,
       role: 'user',
       organization_id: '1',
-      territory: 'North',
       phone: `555-000${id.padStart(4, '0')}`,
       position: 'Sales Representative',
       is_active: true,

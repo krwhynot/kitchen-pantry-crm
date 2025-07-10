@@ -33,7 +33,6 @@ export const userSchemas = {
     password: z.string().min(8, 'Password must be at least 8 characters'),
     fullName: z.string().min(1, 'Full name is required'),
     role: z.enum(['admin', 'sales_rep', 'manager', 'viewer']),
-    territory: z.string().optional(),
     phone: commonSchemas.phone,
     isActive: z.boolean().default(true)
   }),
@@ -42,7 +41,6 @@ export const userSchemas = {
     email: commonSchemas.email.optional(),
     fullName: z.string().min(1).optional(),
     role: z.enum(['admin', 'sales_rep', 'manager', 'viewer']).optional(),
-    territory: z.string().optional(),
     phone: commonSchemas.phone,
     isActive: z.boolean().optional()
   }),

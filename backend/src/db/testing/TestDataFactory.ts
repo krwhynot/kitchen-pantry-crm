@@ -68,7 +68,6 @@ export class TestDataFactory {
       role,
       organizationId: overrides.organizationId || faker.string.uuid(),
       phone: faker.phone.number(),
-      territory: faker.location.state(),
       isActive: faker.datatype.boolean(0.95),
       emailVerified: faker.datatype.boolean(0.9),
       mfaEnabled: faker.datatype.boolean(0.3),

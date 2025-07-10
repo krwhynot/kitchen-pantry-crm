@@ -24,7 +24,6 @@ export interface UserRole {
   userId: string
   roleId: string
   organizationId?: string
-  territory?: string
   isActive: boolean
   assignedAt: Date
   assignedBy: string
@@ -33,7 +32,7 @@ export interface UserRole {
 export interface ResourcePermission {
   resource: string
   action: string
-  level: 'organization' | 'territory' | 'user'
+  level: 'organization' | 'user'
   conditions?: Record<string, any>
 }
 
@@ -267,7 +266,6 @@ export class RBACService {
     assignedBy: string,
     options: {
       organizationId?: string
-      territory?: string
       expiresAt?: Date
     } = {}
   ): Promise<UserRole> {
@@ -314,7 +312,6 @@ export class RBACService {
         userId,
         roleId,
         organizationId: options.organizationId,
-        territory: options.territory,
         assignedBy,
         assignedAt: new Date().toISOString(),
         expiresAt: options.expiresAt?.toISOString(),
@@ -331,7 +328,6 @@ export class RBACService {
       userId: assignment.userId,
       roleId: assignment.roleId,
       organizationId: assignment.organizationId,
-      territory: assignment.territory,
       isActive: assignment.isActive,
       assignedAt: new Date(assignment.assignedAt),
       assignedBy: assignment.assignedBy
@@ -421,7 +417,6 @@ export class RBACService {
     action: string,
     context: {
       organizationId?: string
-      territory?: string
       resourceId?: string
       resourceOwnerId?: string
     } = {}
@@ -453,7 +448,6 @@ export class RBACService {
     resource: string,
     context: {
       organizationId?: string
-      territory?: string
       resourceId?: string
       resourceOwnerId?: string
     } = {}
@@ -461,7 +455,7 @@ export class RBACService {
     // Get user information
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('organizationId, territory, role')
+      .select('organizationId, role')
       .eq('id', userId)
       .single()
 
@@ -476,19 +470,6 @@ export class RBACService {
       const hasAdminRole = roles.some(r => r.name === 'admin' && r.isActive)
       
       if (!hasAdminRole) {
-        return false
-      }
-    }
-
-    // Check territory-level access
-    if (context.territory && userData.territory && userData.territory !== context.territory) {
-      // Check if user has cross-territory permissions
-      const roles = await RBACService.getUserRoles(userId, userData.organizationId)
-      const hasManagerRole = roles.some(r => 
-        (r.name === 'admin' || r.name === 'manager') && r.isActive
-      )
-      
-      if (!hasManagerRole) {
         return false
       }
     }
@@ -540,7 +521,6 @@ export class RBACService {
     const restrictions: string[] = []
     
     if (accessLevel === 'sales_rep') {
-      restrictions.push('territory_restricted')
       restrictions.push('no_admin_functions')
     }
     
